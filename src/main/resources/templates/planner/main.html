@@ -28,42 +28,147 @@
             <div id="calendar" class="fc fc-media-screen fc-direction-ltr fc-theme-standard"></div>
         </planner>
 
+        <!-- 일정 등록을 위한 모달 창 -->
+        <div class="planModal modal" tabindex="-1" role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">일정 등록</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <!-- title 입력 -->
+                        <div class="form-group">
+                            <label>Title</label>
+                            <input type="text" class="form-control" name="title" placeholder="Enter 'Title' here...">
+                        </div>
+                        <!-- description 입력 -->
+                        <div class="form-group">
+                            <label>Description</label>
+                            <textarea class="form-control" rows="5" name="description"
+                                      placeholder="Enter 'Description' here..."></textarea>
+                        </div>
+                        <!-- location 입력 -->
+                        <div class="form-group">
+                            <label>Location</label>
+                            <input type="text" class="form-control" name="location"
+                                   placeholder="Enter 'Location' here...">
+                        </div>
+                        <!-- 중요도 입력 -->
+                        <div class="form-group">
+                            <label>Importance<span class="grade"></span></label>
+                            <div class='starrr'></div>
+                        </div>
+                        <div class="form-group">
+                            <label>StartDate</label>
+                            <input type="text" class="form-control" name="start">
+                        </div>
+                        <div class="form-group">
+                            <label>EndDate</label>
+                            <input type="text" class="form-control" name="end">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary planSaveBtn">Save</button>
+                        <button type="button" class="btn btn-warning modifyBtn">Modify</button>
+                        <button type="button" class="btn btn-danger removeBtn">Delete</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script th:src="@{/starrr.js}"></script>
+        <link th:href="@{/css/starrr.css}" rel="stylesheet">
+        <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.2.0/css/font-awesome.min.css">
+
         <script>
             var calendarEl = document.getElementById('calendar');
-
+            var grade = 0;
+            $('.starrr').starrr({
+                rating: grade,
+                change: function (e, value) {
+                    if (value) {
+                        grade = value;
+                    }
+                }
+            });
+            let today = new Date();
+            let planModal = $(".planModal");
+            let inputTitle = $('input[name="title"]');
+            let inputDescription = $('input[name="description"]');
+            let inputLocation = $('input[name="location"]');
+            let inputStart = $('input[name="start"]');
+            let inputEnd = $('input[name="end"]');
             var calendar = new FullCalendar.Calendar(calendarEl, {
                 headerToolbar: {
                     left: 'prev,next today',
                     center: 'title',
                     right: 'dayGridMonth,timeGridWeek,timeGridDay'
                 },
-                /*
-                let today = new Date();
-                date = today.format('YYYY-MM-dd');
-                */
-
-                initialDate: '2022-01-18',
+                initialDate: today,
                 navLinks: true, // can click day/week names to navigate views
                 selectable: true,
                 selectMirror: true,
                 select: function (arg) {
-                    var title = prompt('일정입력하기');
-                    if (title) {
-                        calendar.addEvent({
-                            title: title,
-                            start: arg.start,
-                            end: arg.end,
-                            allDay: arg.allDay
-                        })
+
+                    inputTitle.val("");
+                    inputDescription.val("");
+                    inputLocation.val("");
+                    inputStart.val(arg.start);
+                    inputEnd.val(arg.end);
+                    $(".removeBtn, .modifyBtn").hide();
+                    $(".planSaveBtn").show();
+                    /*
+                    for (key in arg) {
+                        alert("key: " + key + ", value: " + arg[key])
                     }
-                    calendar.unselect()
+                    for (key in arg.view) {
+                        alert("key: " + key + ", value: " + arg.view[key])
+                    }
+                     */
+                    $('.planModal').modal('show');
+
                 },
+
                 eventClick: function (arg) {
-                    alert('상세보기')
-                    /*if (confirm('Are you sure you want to delete this event?')) {
-                        arg.event.remove()
-                    }*/
+                    /*
+                    for (key in arg) {
+                        alert("key: " + key + ", value: " + arg[key])
+                    }
+                    for (key in arg.event) {
+                        alert("in event, key: " + key + ", value: " + arg.event[key])
+                    }
+                    for (key in arg.view) {
+                        alert("in view, key: " + key + ", value: " + arg.view[key])
+                    }
+
+                     */
+                    var arr = arg.view.getCurrentData()
+                    arr = arr.getCurrentData()
+                    arr = arr.dateProfile
+
+                    for (key in arr) {
+                        console.log("\nkey: " + key + ", value: " + arr[key])
+                    }
+
+
+                    /*
+                    inputTitle.val();
+                    inputDescription.val();
+                    inputLocation.val();
+                    inputStart.val(arg.start);
+                    inputEnd.val(arg.end);
+
+                     */
+                    $(".planSaveBtn").hide();
+                    $(".removeBtn, .modifyBtn").show();
+
+                    $('.planModal').modal('show');
                 },
+
                 editable: true,
                 dayMaxEvents: true, // allow "more" link when too many events
                 events: [
@@ -122,6 +227,45 @@
                         start: '2022-01-28'
                     }
                 ]
+            });
+            $(".planSaveBtn").on("click", function () {
+                alert(inputTitle.val())
+                var data = {
+                    title: inputTitle.val(),
+                    description: inputDescription.val(),
+                    location: inputLocation.val(),
+                    grade: grade,
+                    start: inputStart.val(),
+                    end: inputEnd.val()
+                };
+
+                for(key in data){
+                    alert("key: " + key + ", value: " + data[key]);
+                }
+
+
+                /*
+                $.ajax({
+                    url: '/planner/register',
+                    type: "PUT",
+                    data: JSON.stringify(data),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "text",
+                    success: function (result) {
+                        console.log("result:" + result);
+                        self.location.reload();
+                    }
+                });
+
+                 */
+
+                calendar.addEvent({
+                    title: data.title,
+                    start: data.start,
+                    end: data.end
+                });
+                planModal.modal('hide');
+                calendar.unselect()
             });
             calendar.render();
         </script>
