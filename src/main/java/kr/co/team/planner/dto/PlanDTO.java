@@ -1,9 +1,15 @@
 package kr.co.team.planner.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -19,6 +25,9 @@ public class PlanDTO {
     private String title;
     private String description;
     private String location;
+    private int grade;
+    private String start;
+    private String end;
 
     @Builder.Default
     private List<PlanImageDTO> imageDTOList = new ArrayList<>();

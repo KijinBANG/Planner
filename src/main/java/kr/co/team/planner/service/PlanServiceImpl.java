@@ -61,6 +61,12 @@ public class PlanServiceImpl implements PlanService {
     }
 
     @Override
+    public List<Plan> getOnlyPlanList() {
+        List<Plan> plans = planRepository.findAll();
+        return plans;
+    }
+
+    @Override
     public PlanDTO getPlan(Long pno) {
         List<Object[]> result = planRepository.getPlanWithAll(pno);
         Plan plan = (Plan)result.get(0)[0]; // Plan 엔티티는 가장 앞에 존재 - 모든 Row가 동일한 값
@@ -71,8 +77,10 @@ public class PlanServiceImpl implements PlanService {
             planImageList.add(planImage);
         });
 
+        System.out.println("plan 에 현재 들어있는 데이터 내용: " + plan);
+
         Double avg = (Double)result.get(0)[2]; //평균 평점 - 모든 Row가 동일한 값
-        Long reviewCnt = (Long)result.get(0) [3]; //리뷰 개수 - 모든 Row가 동일한 값
+        Long reviewCnt = (Long)result.get(0)[3]; //리뷰 개수 - 모든 Row가 동일한 값
         return entitiesToDTO(plan, planImageList, avg, reviewCnt);
     }
 

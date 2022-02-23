@@ -17,6 +17,8 @@ public interface PlanService {
 
     PageResponseDTO<PlanDTO, Object[]> getList(PageRequestDTO requestDTO);
 
+    List<Plan> getOnlyPlanList();
+
     PlanDTO getPlan(Long pno);
 
     default Map<String, Object> dtoToEntity(PlanDTO planDTO) {
@@ -27,6 +29,9 @@ public interface PlanService {
                 .title(planDTO.getTitle())
                 .description(planDTO.getDescription())
                 .location(planDTO.getLocation())
+                .grade(planDTO.getGrade())
+                .start(planDTO.getStart())
+                .end(planDTO.getEnd())
                 .build();
         entityMap.put("plan", plan);
 
@@ -55,6 +60,9 @@ public interface PlanService {
                 .title(plan.getTitle())
                 .description(plan.getDescription())
                 .location(plan.getLocation())
+                .grade(plan.getGrade())
+                .start(plan.getStart())
+                .end(plan.getEnd())
                 .regDate(plan.getRegDate())
                 .modDate(plan.getModDate())
                 .build();

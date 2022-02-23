@@ -47,7 +47,7 @@
                         <!-- description 입력 -->
                         <div class="form-group">
                             <label>Description</label>
-                            <textarea class="form-control" rows="5" name="description"
+                            <textarea class="form-control" rows="5" id="description"
                                       placeholder="Enter 'Description' here..."></textarea>
                         </div>
                         <!-- location 입력 -->
@@ -85,6 +85,23 @@
         <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.2.0/css/font-awesome.min.css">
 
         <script>
+            /***
+             * DB에서 가져온 자료 JSON parsing
+             * data 활용 연습! 아래의 코드는 형식에 맞지 않기 때문제 오류발생!
+             * console.log(typeof([[${result}]]));
+             * 따라서, view 화면이 아닌 <sciprt> 태그 안에서 데이터를 활용하기 위해서,
+             * 다음과 같이 억시로 JSON 형식으로 맞춘 후 작업을 이어나갈 수 밖에 없었다.
+             */
+            var list = "[[${result}]]"; //list 는 현재 String 타입
+            // 위의 자료를 Javascript 의 Object 타입의 배열로 만들기 위하여 JSON format 에 맞추어 주었다.
+            var array = list.replaceAll(", Plan(", ",{\"");
+            array = array.replaceAll(", ", "\",\"");
+            array = array.replaceAll(")", "\"}");
+            array = array.replaceAll("=", "\":\"");
+            array = array.replaceAll("Plan(", "{\"");
+            // 작업을 완료한 후 JSON parsing
+            list = JSON.parse(array); //드디어! 원하는 결과물을 얻었다!
+
             var calendarEl = document.getElementById('calendar');
             var grade = 0;
             $('.starrr').starrr({
@@ -95,10 +112,21 @@
                     }
                 }
             });
+
+            // Date format 을 맞추기 위한 함수 선언!
+            function formatTime(str) {
+                var d = new Date(str);
+                return d.getFullYear() + "-" + ((d.getMonth() + 1) > 9 ? (d.getMonth() + 1).toString() : "0" + (d.getMonth() + 1)) + "-" + (d.getDate() > 9 ? d.getDate().toString() : "0" + d.getDate().toString());
+            }
+
+            /***
+             * https://fullcalendar.io/docs/event-parsing
+             * 위의 자료를 참고해서 Plan Table의 컬럼명을 좀 수정하는 것이 좋지 않을까?
+             */
             let today = new Date();
             let planModal = $(".planModal");
             let inputTitle = $('input[name="title"]');
-            let inputDescription = $('input[name="description"]');
+            let inputDescription = $('textarea[id="description"]');
             let inputLocation = $('input[name="location"]');
             let inputStart = $('input[name="start"]');
             let inputEnd = $('input[name="end"]');
@@ -112,8 +140,8 @@
                 navLinks: true, // can click day/week names to navigate views
                 selectable: true,
                 selectMirror: true,
-                select: function (arg) {
 
+                select: function (arg) {
                     inputTitle.val("");
                     inputDescription.val("");
                     inputLocation.val("");
@@ -121,153 +149,70 @@
                     inputEnd.val(arg.end);
                     $(".removeBtn, .modifyBtn").hide();
                     $(".planSaveBtn").show();
-                    /*
-                    for (key in arg) {
-                        alert("key: " + key + ", value: " + arg[key])
-                    }
-                    for (key in arg.view) {
-                        alert("key: " + key + ", value: " + arg.view[key])
-                    }
-                     */
-                    $('.planModal').modal('show');
 
+                    $('.planModal').modal('show');
                 },
 
                 eventClick: function (arg) {
-                    /*
-                    for (key in arg) {
-                        alert("key: " + key + ", value: " + arg[key])
-                    }
-                    for (key in arg.event) {
-                        alert("in event, key: " + key + ", value: " + arg.event[key])
-                    }
-                    for (key in arg.view) {
-                        alert("in view, key: " + key + ", value: " + arg.view[key])
-                    }
+                    console.log(arg.event)
 
-                     */
-                    var arr = arg.view.getCurrentData()
-                    arr = arr.getCurrentData()
-                    arr = arr.dateProfile
+                    inputTitle.val(arg.event.title);
+                    inputDescription.val(arg.event.description);
+                    inputLocation.val(arg.event.location);
+                    inputStart.val(arg.event.startStr);
+                    inputEnd.val(arg.event.endStr);
 
-                    for (key in arr) {
-                        console.log("\nkey: " + key + ", value: " + arr[key])
-                    }
-
-
-                    /*
-                    inputTitle.val();
-                    inputDescription.val();
-                    inputLocation.val();
-                    inputStart.val(arg.start);
-                    inputEnd.val(arg.end);
-
-                     */
                     $(".planSaveBtn").hide();
                     $(".removeBtn, .modifyBtn").show();
 
                     $('.planModal').modal('show');
+
+                    $(".removeBtn").on("click", function () {
+                        if (confirm('Are you sure you want to delete this event?')) {
+                            arg.event.remove()
+                        }
+                        //DB에서 삭제하기 위한 코드를 추가할 영역
+
+                        planModal.modal('hide');
+                    });
                 },
 
                 editable: true,
                 dayMaxEvents: true, // allow "more" link when too many events
-                events: [
-                    {
-                        title: '일대다 수업',
-                        start: '2022-01-18T09:30:00'
-                    },
-                    {
-                        title: '팀 프로젝트 공부',
-                        start: '2022-01-07',
-                        end: '2022-01-10'
-                    },
-                    {
-                        groupId: 999,
-                        title: '발표',
-                        start: '2022-01-07T17:00:00'
-                    },
-                    {
-                        groupId: 999,
-                        title: '발표',
-                        start: '2022-01-14T17:00:00'
-                    },
-                    {
-                        title: 'API 공부',
-                        start: '2022-01-18',
-                        end: '2022-01-20'
-                    },
-                    {
-                        title: '회의',
-                        start: '2022-01-06T10:30:00',
-                        end: '2022-01-06T12:30:00'
-                    },
-                    {
-                        title: '점심',
-                        start: '2022-01-16T13:00:00'
-                    },
-                    {
-                        title: '미팅',
-                        start: '2022-01-16T14:30:00'
-                    },
-                    {
-                        title: 'Happy Hour',
-                        start: '2022-01-29T17:30:00'
-                    },
-                    {
-                        title: '저녁',
-                        start: '2022-01-29T20:00:00'
-                    },
-                    {
-                        title: 'Birthday Party',
-                        start: '2022-01-23T07:00:00'
-                    },
-                    {
-                        title: 'Click for Google',
-                        url: 'http://google.com/',
-                        start: '2022-01-28'
-                    }
-                ]
+
+                events: list
             });
+            calendar.render();
+
             $(".planSaveBtn").on("click", function () {
-                alert(inputTitle.val())
                 var data = {
                     title: inputTitle.val(),
                     description: inputDescription.val(),
                     location: inputLocation.val(),
                     grade: grade,
-                    start: inputStart.val(),
-                    end: inputEnd.val()
+                    start: formatTime(inputStart.val()),
+                    end: formatTime(inputEnd.val())
                 };
-
-                for(key in data){
-                    alert("key: " + key + ", value: " + data[key]);
-                }
-
-
-                /*
                 $.ajax({
                     url: '/planner/register',
-                    type: "PUT",
+                    type: "POST",
                     data: JSON.stringify(data),
                     contentType: "application/json; charset=utf-8",
                     dataType: "text",
+                    error: function (result) {
+                        for (key in result) {
+                            console.log("key:" + ", value: " + result.key);
+                        }
+                    },
                     success: function (result) {
                         console.log("result:" + result);
-                        self.location.reload();
+                        calendar.addEvent(data);
                     }
-                });
-
-                 */
-
-                calendar.addEvent({
-                    title: data.title,
-                    start: data.start,
-                    end: data.end
                 });
                 planModal.modal('hide');
                 calendar.unselect()
             });
-            calendar.render();
+
         </script>
 
     </th:block>

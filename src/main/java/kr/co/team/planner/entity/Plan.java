@@ -1,6 +1,12 @@
 package kr.co.team.planner.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import lombok.*;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -24,8 +30,8 @@ public class Plan extends BaseEntity {
     private String description;
     private String location;
     private int grade;
-    private LocalDateTime start;
-    private LocalDateTime end;
+    private String start;
+    private String end;
 
     public void changeGrade(int grade){
         this.grade = grade;
