@@ -45,4 +45,10 @@ public class Plan extends BaseEntity {
     public void changeLocation(String location){
         this.location = location;
     }
+    public void changeStart(String start) {
+        this.start = start;
+    }
+    public void changeEnd(String end) {
+        this.end = end;
+    }
 }

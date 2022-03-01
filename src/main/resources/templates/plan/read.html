@@ -196,6 +196,8 @@
                     }
 
                     $.getJSON("/reviews/" + pno + "/list", function (arr) {
+                        console.log("this is arr.", arr)
+
                         var str = "";
 
                         arr.sort(function (o1, o2) {

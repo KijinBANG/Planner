@@ -1,8 +1,11 @@
 package kr.co.team.planner.controller;
 
+import kr.co.team.planner.dto.PlanDTO;
 import kr.co.team.planner.entity.Plan;
 import kr.co.team.planner.service.PlanService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,24 +27,7 @@ public class HomeController {
     }
 
     @GetMapping("/planner/main")
-    public void planner(Model model) {
-        List<Plan> plans = planService.getOnlyPlanList();
-//        Map<String, Object> map;
-//        List<Map<String, Object>> li = new ArrayList<>();
-//        for (Plan plan : plans) {
-//            map = new HashMap<>();
-//            map.put("pno", plan.getPno());
-//            map.put("title", plan.getTitle());
-//            map.put("description", plan.getDescription());
-//            map.put("location", plan.getLocation());
-//            map.put("grade", plan.getGrade());
-//            map.put("start", plan.getStart());
-//            map.put("end", plan.getEnd());
-//            li.add(map);
-//        }
-//        System.out.println(li);
-//        model.addAttribute("result", li);
-        model.addAttribute("result", plans);
+    public void planner() {
     }
 
 }

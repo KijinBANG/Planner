@@ -17,7 +17,11 @@ public interface PlanService {
 
     PageResponseDTO<PlanDTO, Object[]> getList(PageRequestDTO requestDTO);
 
-    List<Plan> getOnlyPlanList();
+    List<PlanDTO> getOnlyPlanList();
+
+    void modifyPlan(PlanDTO planDTO);
+
+    void removePlan(Long pno);
 
     PlanDTO getPlan(Long pno);
 
@@ -81,6 +85,23 @@ public interface PlanService {
 
         planDTO.setAvg(avg);
         planDTO.setReviewCnt(reviewCnt);
+
+        return planDTO;
+    }
+
+    default PlanDTO entityToDTO(Plan plan) {
+
+        PlanDTO planDTO = PlanDTO.builder()
+                .pno(plan.getPno())
+                .title(plan.getTitle())
+                .description(plan.getDescription())
+                .location(plan.getLocation())
+                .grade(plan.getGrade())
+                .start(plan.getStart())
+                .end(plan.getEnd())
+                .regDate(plan.getRegDate())
+                .modDate(plan.getModDate())
+                .build();
 
         return planDTO;
     }

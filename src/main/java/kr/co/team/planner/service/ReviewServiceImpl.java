@@ -47,7 +47,9 @@ public class ReviewServiceImpl implements ReviewService {
     public void modify(ReviewDTO reviewDTO) {
         Optional<Review> result = reviewRepository.findById(reviewDTO.getReviewnum());
         if(result.isPresent()){
-            Review planReview = result.get(); planReview.changeGrade(reviewDTO.getGrade()); planReview.changeText(reviewDTO.getText());
+            Review planReview = result.get();
+            planReview.changeGrade(reviewDTO.getGrade());
+            planReview.changeText(reviewDTO.getText());
             reviewRepository.save(planReview);
         }
     }

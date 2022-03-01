@@ -15,11 +15,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @Log4j2
@@ -61,9 +59,30 @@ public class PlanServiceImpl implements PlanService {
     }
 
     @Override
-    public List<Plan> getOnlyPlanList() {
+    public List<PlanDTO> getOnlyPlanList() {
         List<Plan> plans = planRepository.findAll();
-        return plans;
+        System.out.println("here is PlanServiceImpl! & this is for debugging" + plans);
+        return plans.stream().map(plan -> entityToDTO(plan)).collect(Collectors.toList());
+    }
+
+    @Override
+    public void modifyPlan(PlanDTO planDTO) {
+        Optional<Plan> result = planRepository.findById(planDTO.getPno());
+        if(result.isPresent()) {
+            Plan plan = result.get();
+            plan.changeEnd(planDTO.getEnd());
+            plan.changeStart(planDTO.getStart());
+            plan.changeGrade(planDTO.getGrade());
+            plan.changeDescription(planDTO.getDescription());
+            plan.changeLocation(planDTO.getLocation());
+            plan.changeTitle(planDTO.getTitle());
+            planRepository.save(plan);
+        }
+    }
+
+    @Override
+    public void removePlan(Long pno) {
+        planRepository.deleteById(pno);
     }
 
     @Override
