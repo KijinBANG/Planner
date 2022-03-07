@@ -85,12 +85,6 @@
         <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.2.0/css/font-awesome.min.css">
 
         <script>
-            var list = {}
-            $.getJSON("/planner/list",function (arr) {
-                console.log("arr's type is ", typeof(arr))
-                console.log("arr is ", arr)
-                list = arr
-            });
             var calendarEl = document.getElementById('calendar');
             var grade = 0;
             $('.starrr').starrr({
@@ -115,7 +109,6 @@
             let inputStart = $('input[name="start"]');
             let inputEnd = $('input[name="end"]');
 
-        $(document).ajaxStop(function () {
             var calendar = new FullCalendar.Calendar(calendarEl, {
                 headerToolbar: {
                     left: 'prev,next today',
@@ -159,14 +152,13 @@
                                 console.log(result)
                             },
                             success: function (result) {
-                                console.log("result:" + result);
-                                // calendar.addEvent(data);
-                                self.location.reload();
+                                console.log(result)
+                                calendar.addEvent(data);
                             },
                         });
                         planModal.modal('hide');
-                        calendar.unselect()
                     });
+                    calendar.unselect()
                 },
 
                 eventClick: function (arg) {
@@ -195,8 +187,7 @@
                                 dataType: "text",
                                 success: function (result) {
                                     console.log("result:" + result);
-                                    // arg.event.remove();
-                                    self.location.reload();
+                                    arg.event.remove();
                                 }
                             })
                         }
@@ -223,7 +214,8 @@
                             dataType: "text",
                             success: function (result) {
                                 console.log(result);
-                                self.location.reload();
+                                arg.event.remove();
+                                calendar.addEvent(data)
                             }
                         });
                         planModal.modal("hide");
@@ -232,13 +224,14 @@
                 },
 
                 editable: true,
-                dayMaxEvents: true, // allow "more" link when too many events
-
-                events: list
+                dayMaxEvents: true
+            });
+            $.getJSON("/planner/list",function (arr) {
+                for (var i in arr) {
+                    calendar.addEvent(arr[i])
+                }
             });
             calendar.render();
-
-        })
 
         </script>
 
